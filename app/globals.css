@@ -1,26 +1,151 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ---------------------------------------------------------------------------
+   Design tokens — valeurs relevées sur reflexrent.fr
+   --------------------------------------------------------------------------- */
+@theme {
+  /* Fonds */
+  --color-bg: #0a0c10;
+  --color-bg-deep: #00060f;
+  --color-fg: #fafafa;
+
+  /* Bleu de marque — ce n'est PAS le blue-500 de Tailwind */
+  --color-blue-300: #6fb6ff;
+  --color-blue-400: #54a2ff;
+  --color-blue-500: #2196f3;
+  --color-blue-600: #1581da;
+  --color-blue-glow: #2196f373;
+
+  --container-max: 1280px;
+
+  --font-sans: var(--font-inter), "SF Pro Display", "Inter", -apple-system,
+    BlinkMacSystemFont, "Helvetica Neue", system-ui, sans-serif;
+  --font-mono: var(--font-mono-local), "SF Mono", Menlo, Monaco, "Courier New", monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ---------------------------------------------------------------------------
+   Base
+   --------------------------------------------------------------------------- */
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-fg);
+  overflow-x: hidden;
+}
+
+/* ---------------------------------------------------------------------------
+   Utilitaires maison
+   --------------------------------------------------------------------------- */
+@utility container-x {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 4vw, 2rem);
+}
+
+@utility glow-blue {
+  box-shadow: 0 0 30px var(--color-blue-glow);
+}
+
+/* ---------------------------------------------------------------------------
+   Fond d'ambiance : deux halos bleus qui dérivent derrière tout le site
+   --------------------------------------------------------------------------- */
+.bg-orbs {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background: var(--color-bg-deep);
+}
+
+.bg-orbs::before,
+.bg-orbs::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.5;
+}
+
+.bg-orbs::before {
+  width: 70vw;
+  height: 70vw;
+  top: -20%;
+  left: -10%;
+  background: radial-gradient(circle, #2196f359 0%, transparent 65%);
+  animation: orb-drift-1 22s ease-in-out infinite alternate;
+}
+
+.bg-orbs::after {
+  width: 60vw;
+  height: 60vw;
+  bottom: -15%;
+  right: -10%;
+  background: radial-gradient(circle, #2196f340 0%, transparent 65%);
+  animation: orb-drift-2 28s ease-in-out infinite alternate;
+}
+
+/* ---------------------------------------------------------------------------
+   Keyframes
+   --------------------------------------------------------------------------- */
+@keyframes bob {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: translate(-50%);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, 8px);
+  }
+}
+
+@keyframes orb-drift-1 {
+  0% {
+    transform: translate(0);
+  }
+  100% {
+    transform: translate(8vw, 6vh);
+  }
+}
+
+@keyframes orb-drift-2 {
+  0% {
+    transform: translate(0);
+  }
+  100% {
+    transform: translate(-7vw, -5vh);
+  }
+}
+
+/* Mur d'avis : boucle verticale sans couture.
+   Le contenu est dupliqué ×2, on translate de -50% → retour exact au départ.
+   (L'original utilise framer-motion ; le rendu est identique, sans la dépendance.) */
+@keyframes marquee-y {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Accessibilité
+   --------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .bg-orbs::before,
+  .bg-orbs::after {
+    animation: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+  [data-marquee] {
+    animation: none !important;
+  }
 }
